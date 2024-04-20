@@ -1,4 +1,5 @@
 import multer from "multer";
+import sharp from "sharp";
 import {
   uploadFileToS3,
   deleteFileFromS3,
@@ -28,6 +29,7 @@ export const getAllProducts = async (req, res, next) => {
 
     return res.status(200).json({
       status: "success",
+      length:products.length,
       data: products,
     });
   } catch (error) {
@@ -52,7 +54,9 @@ export const addProduct = async (req, res, next) => {
       }
       const imageUrls = [];
       for (const file of files) {
-        const buffer = Buffer.from(file.buffer);
+        const buffer = await sharp(file.buffer)
+          .resize({ width: 500, height: 500 })
+          .toBuffer();
         const { originalname } = file;
         const imageUrl = await uploadFileToS3(
           buffer,
@@ -70,6 +74,7 @@ export const addProduct = async (req, res, next) => {
         quantity: req.body.quantity,
         category: req.body.category,
         brand: req.body.brand,
+        material:req.body.material,
         dimensions: req.body.dimensions,
         color: req.body.color,
         images: imageUrls,
@@ -139,3 +144,24 @@ export const updateProduct = async (req, res, next) => {
     return next(new AppError("Error editing the product", 404));
   }
 };
+
+
+export const getProduct = async(req,res,next)=>{
+  try {
+
+    const data = await Product.findById(req.params.id);
+
+    if (!data) {
+      return next(new AppError("No product found with that ID", 404));
+    }
+
+    res.status(200).json({
+      status: "successfully got the product details",
+      data,
+    });
+
+  } catch (err) {
+    console.log(err);
+    return next(new AppError("Error getting the product", 404));
+  }
+}

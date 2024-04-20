@@ -12,7 +12,7 @@ const productSchema = new mongoose.Schema({
     type: String,
   },
   price:{
-    type:String,
+    type:Number,
     required:[true, 'a product must have a price']
   },
   unit:{
@@ -20,7 +20,7 @@ const productSchema = new mongoose.Schema({
     required:[true, 'a product must have a unit for specifying the dimensions']
   },
   quantity:{
-    type: String,
+    type: Number,
     required:[true, 'a product must have a quantity for stock management']
   },
   category:{
@@ -28,6 +28,9 @@ const productSchema = new mongoose.Schema({
     required:[true, 'a product must belong to any category of filteration']
   },
   brand:{
+    type:String,
+  },
+  material:{
     type:String,
   },
   dimensions:{

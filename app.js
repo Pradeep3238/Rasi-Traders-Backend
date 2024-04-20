@@ -1,21 +1,48 @@
 import express from "express";
 import dotenv from "dotenv";
-import productRouter from './routes/productRoutes.js'
-import errorHandler from "./controllers/errorController.js";
-import cors from 'cors';
+import cors from "cors";
+import passport from "passport";
 
-dotenv.config({ path: '.env' })
+import session from "express-session";
+
+import productRouter from "./routes/productRoutes.js";
+import authRouter from "./routes/authRoutes.js";
+import userRouter from './routes/userRoutes.js';
+import cartRouter from './routes/cartRoutes.js';
+import  requireAuth from "./middleware/requireAuth.js";
+import errorHandler from "./controllers/errorController.js";
+import { useGoogleStrategy } from "./utils/config/passport.config.js";
+
+
+dotenv.config({ path: ".env" });
+
 const app = express();
 
-app.use(cors({ origin: '*' }));
-
-
+app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));  
+
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 
-app.use('/api/v1/products', productRouter)
+useGoogleStrategy();
+
+app.use("/auth/google", authRouter);
+
+
+app.use('/api/v1/users',userRouter);
+app.use('/api/v1/cart', cartRouter)
+
+app.use("/api/v1/products", productRouter);
+
 
 app.use(errorHandler);
 
 export default app;
+  
