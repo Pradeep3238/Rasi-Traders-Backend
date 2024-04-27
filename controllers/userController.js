@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/helpers/jwt.helper.js";
 
 export const registerUser = async (req, res, next) => {
-  const { username, email, password, phoneNumber, shippingAddress } = req.body;
+  const { userName, email, password, phoneNumber, shippingAddress } = req.body;
 
   const existingUser = await User.findOne({ email });
   if (email === existingUser) {

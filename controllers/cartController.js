@@ -71,7 +71,7 @@ export const getCartItems = async(req,res,next) =>{
         const cart = await ShoppingCart.findOne({user:id})
         if(!cart){
            await ShoppingCart.create({
-            user: userId,
+            user: id,
             items: [],
           });
         }

@@ -2,6 +2,7 @@ import Razorpay from "razorpay";
 import crypto from "crypto";
 import Order from "../models/OrderModel.js";
 import AppError from "../utils/appError.js";
+import { stat } from "fs/promises";
 
 export const tryOrder = async (req, res) => {
   try {
@@ -80,8 +81,39 @@ export const createOrder = async (req, res, next) => {
   });
 };
 
-export const deleteOrder = (req, res, next) => {};
-export const updateOrder = (req, res, next) => {};
+export const cancelOrder =async (req, res, next) => {
+  const transactionId  = req.params.id
+
+  try{
+    const order = await Order.findOne({razorpay_payment_id:transactionId});
+    if (!order) {
+      return next(new AppError("Order not found", 404));
+    }
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_ID,
+      key_secret: process.env.RAZORPAY_SECRET,
+    })
+    try{
+      const refundResponse = razorpay.payments.refund(transactionId,{
+        amount: (order.billAmount * 100)/2, // Convert to paise
+        speed:'normal',
+
+      })
+    }catch(error){
+      return next(new AppError(`Refund failure. an error in gateway.${error}`, 400))
+    }
+    order.status = 'cancelled'
+      await order.save();
+
+    res.json({
+      status:"success",
+      message: "Order cancelled successfully",
+    })
+  }catch(err){
+    return next(new AppError(`Something went wrong. cant cancel the order`,404))
+  }
+};
+
 export const getOrders = async (req, res, next) => {
   try {
     const order = await Order.find({ user:  req.params.id });

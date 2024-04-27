@@ -1,6 +1,6 @@
 import express from "express"
 
-import {tryOrder,createOrder, getAllOrders, getOrders, deleteOrder, updateOrder} from '../controllers/orderController.js'
+import {tryOrder,createOrder, getOrders, cancelOrder} from '../controllers/orderController.js'
 
 const router = express.Router();
 
@@ -15,7 +15,9 @@ router
 router
     .route('/:id')
     .get(getOrders)
-    .delete(deleteOrder)
-    .patch(updateOrder)
+
+router
+    .route('/cancel/:id')
+    .post(cancelOrder)
 
 export default router;
