@@ -19,10 +19,20 @@ const shoppingCartSchema = mongoose.Schema({
       },
     },
   ],
+  totalQuantity:{
+    type:Number,
+    required:true,
+    default:0
+  },
+  billAmount:{
+    type:Number,
+    required:true,
+    default:0
+  }
 });
 
-shoppingCartSchema.pre(`findOne`, async function(next) {
-  console.log('midleware exec')
+shoppingCartSchema.pre(/^find/, async function(next) {
+  console.log('cart midleware exec')
   try {
      this.populate({
       path: "items.product",
@@ -33,6 +43,7 @@ shoppingCartSchema.pre(`findOne`, async function(next) {
     next(error);
   }
 });
+
 
 const ShoppingCart = mongoose.model("ShoppingCart", shoppingCartSchema);
 

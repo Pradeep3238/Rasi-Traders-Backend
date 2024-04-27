@@ -4,7 +4,6 @@ const orderSchema = mongoose.Schema({
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
     },
     products: [
       {
@@ -23,10 +22,17 @@ const orderSchema = mongoose.Schema({
         },
       },
     ],
-    totalPrice: {
+    billAmount: {
       type: Number,
       required: true,
     },
+    totalQuantity:{
+      type:Number,
+      required:true
+    },
+    razorpay_order_id:String,
+    razorpay_payment_id:String,
+    razorpay_signature:String,
     status: {
       type: String,
       enum: ["pending", "processing", "shipped", "delivered"],
@@ -35,13 +41,30 @@ const orderSchema = mongoose.Schema({
     shippingAddress: {
       street: String,
       city: String,
-      state: String,
       zip: String,
     },
   },
   { timestamps: true }
 );
 
+orderSchema.pre(/^find/, async function(next) {
+  console.log('order middleware exec');
+  try {
+    this.populate({
+      path: "user",
+      model:'User'
+    }).populate({
+      path: "products.product",
+      model:'Product'
+    });
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+
 const Order = mongoose.model("Order", orderSchema);
+
 
 export default Order;

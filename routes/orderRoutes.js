@@ -1,17 +1,20 @@
 import express from "express"
 
-import {createOrder, getAllOrders, getOrder, deleteOrder, updateOrder} from '../controllers/authController'
+import {tryOrder,createOrder, getAllOrders, getOrders, deleteOrder, updateOrder} from '../controllers/orderController.js'
 
 const router = express.Router();
 
 router
     .route('/')
-    .get(getAllOrders)
+    .post(tryOrder)
+
+router
+    .route('/create')
     .post(createOrder)
 
 router
     .route('/:id')
-    .get(getOrder)
+    .get(getOrders)
     .delete(deleteOrder)
     .patch(updateOrder)
 

@@ -1,21 +1,21 @@
 import mongoose from "mongoose";
 import ShoppingCart from "../models/CartModel.js";
+import User from '../models/UserModel.js'
 import AppError from "../utils/appError.js";;
 
 export const updateCart = async (req, res, next) => {
+  console.log('update cart called')
   try {
     const data = req.body;
     const userId = req.params.id
+    console.log(data)
+    let shoppingCart = await ShoppingCart.findOne({ user: userId })
 
     const incomingItems = data.items.map((item) => ({
       product: new mongoose.Types.ObjectId(item.itemId),
       quantity: item.quantity,
     }));
 
-    let shoppingCart = await ShoppingCart.findOne({ user: userId }).populate({
-      path: "items.product",
-      model:'Product'
-    });;
 
     if (shoppingCart) {
       shoppingCart.items = shoppingCart.items.filter((existingItem) => {
@@ -40,6 +40,8 @@ export const updateCart = async (req, res, next) => {
           shoppingCart.items.push(newItem);
         }
       });
+      shoppingCart.totalQuantity = data.totalQuantity
+      shoppingCart.billAmount = data.billAmount
       await shoppingCart.save();
 
     } else {
@@ -49,7 +51,9 @@ export const updateCart = async (req, res, next) => {
       });
     }
 
-    // Send the response
+    await User.findByIdAndUpdate(userId, { $set: { cart: shoppingCart._id } });
+   await User.findById(userId).populate('cart');
+
     res.status(200).json({
       message: "Shopping cart updated successfully",
       cart: shoppingCart,
@@ -61,17 +65,16 @@ export const updateCart = async (req, res, next) => {
 };
 
 export const getCartItems = async(req,res,next) =>{
-console.log(req.params)
+  console.log(req.params)
     try{
         const id = new mongoose.Types.ObjectId(req.params.id)
-        const cart = await ShoppingCart.findOne({user:id});
+        const cart = await ShoppingCart.findOne({user:id})
         if(!cart){
            await ShoppingCart.create({
             user: userId,
             items: [],
           });
         }
-
         res.status(200).json({
             message:"Successfully got the cart items",
             cart

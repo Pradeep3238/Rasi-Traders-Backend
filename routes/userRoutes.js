@@ -17,7 +17,7 @@ router
     .get(getAllUsers)
 router
     .route('/:id')
-    .delete(deleteUser)
     .patch(updateUser)
+    .delete(deleteUser)
 
 export default router;

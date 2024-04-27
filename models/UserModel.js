@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
-  username: {
+  userName: {
     type: String,
   },
   email: {
@@ -23,17 +23,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     default:null
   },
-  address: {
+  shippingAddress: {
     street: String,
     city: String,
     zip: String,
   },
   cart: {
-    type: [{
+    type: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product'
-    }],
-    default: []
+      ref: 'ShoppingCart'
+    },
   },
   orders: {
     type:  [{
@@ -46,5 +45,31 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model("User", userSchema);
+
+userSchema.pre(/^find/,  async function(next) {
+  console.log('midleware exec')
+  try {
+     this.populate({
+      path: "cart",
+      model:'ShopppingCart'
+    });
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+userSchema.pre(/^find/,  async function(next) {
+  console.log('midleware exec')
+  try {
+     this.populate({
+      path: "orders",
+      model:'Order'
+    });
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
 
 export default User;
