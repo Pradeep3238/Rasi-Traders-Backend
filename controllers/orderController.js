@@ -3,6 +3,8 @@ import crypto from "crypto";
 import Order from "../models/OrderModel.js";
 import AppError from "../utils/appError.js";
 import { stat } from "fs/promises";
+import ShoppingCart from "../models/CartModel.js";
+import Product from "../models/ProductModel.js";
 
 export const tryOrder = async (req, res) => {
   try {
@@ -15,7 +17,6 @@ export const tryOrder = async (req, res) => {
     if (!order) {
       return res.status(500).send("error");
     }
-    console.log(order);
     res.json(order);
   } catch (err) {
     console.log(err);
@@ -66,8 +67,19 @@ export const createOrder = async (req, res, next) => {
     });
 
     // Save the new order to the database
-    const savedOrder = await newOrder.save();
-    console.log("Order saved successfully:", savedOrder);
+    await newOrder.save();
+    
+    await ShoppingCart.findOneAndDelete({user:user})
+
+    for (const item of products.items) {
+      const product = await Product.findById(item.itemId);
+      if (product) {
+        product.quantity -= item.quantity;
+        await product.save();
+      }
+    }
+
+
   } catch (error) {
     console.error("Error saving order:", error);
     return next(new AppError("Error saving orders to db", 500));

@@ -29,7 +29,7 @@ export const getAllProducts = async (req, res, next) => {
 
     return res.status(200).json({
       status: "success",
-      length:products.length,
+      length: products.length,
       data: products,
     });
   } catch (error) {
@@ -74,7 +74,7 @@ export const addProduct = async (req, res, next) => {
         quantity: req.body.quantity,
         category: req.body.category,
         brand: req.body.brand,
-        material:req.body.material,
+        material: req.body.material,
         dimensions: req.body.dimensions,
         color: req.body.color,
         images: imageUrls,
@@ -121,12 +121,10 @@ export const deleteProduct = async (req, res, next) => {
 
 export const updateProduct = async (req, res, next) => {
   try {
-
     const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
-
 
     if (!product) {
       return next(new AppError("No product found with that ID", 404));
@@ -138,17 +136,14 @@ export const updateProduct = async (req, res, next) => {
         data: product,
       },
     });
-
   } catch (err) {
     console.log(err);
     return next(new AppError("Error editing the product", 404));
   }
 };
 
-
-export const getProduct = async(req,res,next)=>{
+export const getProduct = async (req, res, next) => {
   try {
-
     const data = await Product.findById(req.params.id);
 
     if (!data) {
@@ -159,9 +154,33 @@ export const getProduct = async(req,res,next)=>{
       status: "successfully got the product details",
       data,
     });
-
   } catch (err) {
     console.log(err);
     return next(new AppError("Error getting the product", 404));
   }
-}
+};
+
+export const verifyStock = async (req, res, next) => {
+  console.log("stock verify called");
+  try {
+    const items = req.body.items;
+    let allItemsInStock = true;
+
+    for (const item of items) {
+      const product = await Product.findById(item.itemId);
+      if (!product || product.quantity < item.quantity) {
+        allItemsInStock = false;
+        break;
+      }
+    }
+    if (allItemsInStock) {
+      res.status(200).json({ message: "All items are in stock" });
+    } else {
+      return next(
+        new AppError(`Insufficient stock for one or more products`, 400)
+      );
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
