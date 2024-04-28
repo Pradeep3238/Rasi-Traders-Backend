@@ -1,21 +1,20 @@
 import mongoose from "mongoose";
 import ShoppingCart from "../models/CartModel.js";
-import User from '../models/UserModel.js'
-import AppError from "../utils/appError.js";;
+import User from "../models/UserModel.js";
+import AppError from "../utils/appError.js";
 
 export const updateCart = async (req, res, next) => {
-  console.log('update cart called')
+  console.log("update cart called");
   try {
     const data = req.body;
-    const userId = req.params.id
-    console.log(data)
-    let shoppingCart = await ShoppingCart.findOne({ user: userId })
+    const userId = req.params.id;
+    console.log(data);
+    let shoppingCart = await ShoppingCart.findOne({ user: userId });
 
     const incomingItems = data.items.map((item) => ({
       product: new mongoose.Types.ObjectId(item.itemId),
       quantity: item.quantity,
     }));
-
 
     if (shoppingCart) {
       shoppingCart.items = shoppingCart.items.filter((existingItem) => {
@@ -27,7 +26,6 @@ export const updateCart = async (req, res, next) => {
       });
 
       incomingItems.forEach((newItem) => {
-
         const existingItemIndex = shoppingCart.items.findIndex((item) =>
           item.product.equals(newItem.product)
         );
@@ -40,10 +38,9 @@ export const updateCart = async (req, res, next) => {
           shoppingCart.items.push(newItem);
         }
       });
-      shoppingCart.totalQuantity = data.totalQuantity
-      shoppingCart.billAmount = data.billAmount
+      shoppingCart.totalQuantity = data.totalQuantity;
+      shoppingCart.billAmount = data.billAmount;
       await shoppingCart.save();
-
     } else {
       shoppingCart = await ShoppingCart.create({
         user: userId,
@@ -52,7 +49,7 @@ export const updateCart = async (req, res, next) => {
     }
 
     await User.findByIdAndUpdate(userId, { $set: { cart: shoppingCart._id } });
-   await User.findById(userId).populate('cart');
+    await User.findById(userId).populate("cart");
 
     res.status(200).json({
       message: "Shopping cart updated successfully",
@@ -64,24 +61,23 @@ export const updateCart = async (req, res, next) => {
   }
 };
 
-export const getCartItems = async(req,res,next) =>{
-  console.log(req.params)
-    try{
-        const id = new mongoose.Types.ObjectId(req.params.id)
-        const cart = await ShoppingCart.findOne({user:id})
-        if(!cart){
-           await ShoppingCart.create({
-            user: id,
-            items: [],
-          });
-        }
-        res.status(200).json({
-            message:"Successfully got the cart items",
-            cart
-        })
-
-    }catch(err){
-        console.error(err);
-        return next(new AppError("Error fetching the cart", 400));
+export const getCartItems = async (req, res, next) => {
+  console.log(req.params);
+  try {
+    const id = new mongoose.Types.ObjectId(req.params.id);
+    const cart = await ShoppingCart.findOne({ user: id });
+    if (!cart) {
+      await ShoppingCart.create({
+        user: id,
+        items: [],
+      });
     }
-}
+    res.status(200).json({
+      message: "Successfully got the cart items",
+      cart,
+    });
+  } catch (err) {
+    console.error(err);
+    return next(new AppError("Error fetching the cart", 400));
+  }
+};

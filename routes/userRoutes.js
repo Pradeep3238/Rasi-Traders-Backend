@@ -5,6 +5,9 @@ import {registerUser,deleteUser,updateUser,getAllUsers, loginUser} from '../cont
 const router = express.Router();
 
 router
+    .route('/')
+    .get(getAllUsers)
+router
     .route('/login')
     .post(loginUser)
 
@@ -12,9 +15,6 @@ router
     .route('/signup')
     .post(registerUser)
 
-router
-    .route('/')
-    .get(getAllUsers)
 router
     .route('/:id')
     .patch(updateUser)

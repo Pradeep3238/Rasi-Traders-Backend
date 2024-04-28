@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
   googleId: {
@@ -52,16 +52,7 @@ userSchema.pre(/^find/,  async function(next) {
      this.populate({
       path: "cart",
       model:'ShopppingCart'
-    });
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
-userSchema.pre(/^find/,  async function(next) {
-  console.log('midleware exec')
-  try {
-     this.populate({
+    }).populate({
       path: "orders",
       model:'Order'
     });
@@ -70,6 +61,7 @@ userSchema.pre(/^find/,  async function(next) {
     next(error);
   }
 });
+
 
 
 export default User;

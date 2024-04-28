@@ -35,7 +35,7 @@ const orderSchema = mongoose.Schema({
     razorpay_signature:String,
     status: {
       type: String,
-      enum: ["pending", "processing", "shipped", "delivered","cancelled"],
+      enum: ["pending", "confirmed", "shipped", "delivered","cancelled"],
       default: "pending",
     },
     shippingAddress: {

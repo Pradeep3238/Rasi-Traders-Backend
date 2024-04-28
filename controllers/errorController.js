@@ -16,7 +16,7 @@ const MulterErrorHandler = (error) => {
 };
 
 const DefaultErrorHandler = (error) => {
-  return new AppError(`${error.message}`, 500);
+  return new AppError(`${error.message}`, error.statusCode);
 };
 
 const errorHandler = (error, req, res, next) => {

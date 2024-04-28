@@ -1,6 +1,6 @@
 import express from "express"
 
-import {tryOrder,createOrder, getOrders, cancelOrder} from '../controllers/orderController.js'
+import {tryOrder,createOrder, getOrders, cancelOrder, getAllOrders, updateOrder} from '../controllers/orderController.js'
 
 const router = express.Router();
 
@@ -13,11 +13,16 @@ router
     .post(createOrder)
 
 router
-    .route('/:id')
-    .get(getOrders)
+    .route('/all')
+    .get(getAllOrders)
 
 router
     .route('/cancel/:id')
     .post(cancelOrder)
+
+router
+    .route('/:id')
+    .get(getOrders)
+    .patch(updateOrder)
 
 export default router;

@@ -2,9 +2,9 @@ import Razorpay from "razorpay";
 import crypto from "crypto";
 import Order from "../models/OrderModel.js";
 import AppError from "../utils/appError.js";
-import { stat } from "fs/promises";
 import ShoppingCart from "../models/CartModel.js";
 import Product from "../models/ProductModel.js";
+import User from "../models/UserModel.js";
 
 export const tryOrder = async (req, res) => {
   try {
@@ -44,7 +44,7 @@ export const createOrder = async (req, res, next) => {
     const data = req.body;
     console.log(data);
     const {
-      user,
+      user:userId,
       products,
       razorpay_payment_id,
       razorpay_order_id,
@@ -68,6 +68,18 @@ export const createOrder = async (req, res, next) => {
 
     // Save the new order to the database
     await newOrder.save();
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return next(new AppError("User not found", 404));
+    }
+
+    // Push the new order to the user's orders array
+    user.orders.push(newOrder._id);
+
+    // Save the updated user document
+    await user.save();
+
     
     await ShoppingCart.findOneAndDelete({user:user})
 
@@ -143,4 +155,39 @@ export const getOrders = async (req, res, next) => {
   }
 };
 
-export const getAllOrders = (req, res, next) => {};
+export const getAllOrders = async(req, res, next) => {
+  try{
+    let orders = await Order.find({})
+    return res.status(200).json({
+      status: "success",
+      data: orders,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Failed to fetch user",
+    });
+  }
+};
+
+export const updateOrder = async(req, res, next) => {
+  try{
+    const order = await Order.findByIdAndUpdate(req.params.id, req.body,{
+      new:true,
+      runValidators:true
+    })
+    if (!order) {
+      return next(new AppError("No order found with that ID", 404));
+    }
+
+    res.status(200).json({
+      status: "successfully updated the order details",
+      data: {
+        data: order,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    return next(new AppError("Error editing the order", 404));
+  }
+};
