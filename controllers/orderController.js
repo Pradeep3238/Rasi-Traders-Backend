@@ -69,16 +69,16 @@ export const createOrder = async (req, res, next) => {
     // Save the new order to the database
     await newOrder.save();
 
-    const user = await User.findById(userId);
-    if (!user) {
+    const currUser = await User.findById(userId);
+    if (!currUser) {
       return next(new AppError("User not found", 404));
     }
 
     // Push the new order to the user's orders array
-    user.orders.push(newOrder._id);
+    currUser.orders.push(newOrder._id);
 
     // Save the updated user document
-    await user.save();
+    await currUser.save();
 
     
     await ShoppingCart.findOneAndDelete({user:user})
@@ -119,10 +119,16 @@ export const cancelOrder =async (req, res, next) => {
     })
     try{
       const refundResponse = razorpay.payments.refund(transactionId,{
-        amount: (order.billAmount * 100)/2, // Convert to paise
+        amount: (order.billAmount * 100)/2, 
         speed:'normal',
-
       })
+      for (const item of order.products) {
+        const product = await Product.findById(item.product);
+        if (product) {
+          product.quantity += item.quantity; // Add back the cancelled quantity
+          await product.save();
+        }
+      }
     }catch(error){
       return next(new AppError(`Refund failure. an error in gateway.${error}`, 400))
     }

@@ -115,7 +115,7 @@ export const deleteUser = async (req, res, next) => {
 export const getAllUsers = async (req, res, next) => {
   try {
     const user = await User.find({});
-
+    console.log(user)
     return res.status(200).json({
       status: "success",
       data: user,
