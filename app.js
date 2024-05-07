@@ -11,6 +11,7 @@ import authRouter from "./routes/authRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 import cartRouter from "./routes/cartRoutes.js";
 import orderRouter from "./routes/orderRoutes.js";
+import feedbackRouter from './routes/feedbackRoutes.js';
 import adminRouter from './routes/adminRoutes.js';
 import requireAuth from "./middleware/requireAuth.js";
 import errorHandler from "./controllers/errorController.js";
@@ -44,7 +45,9 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/cart", cartRouter);
 
 app.use("/api/v1/products", productRouter);
-app.use("/api/v1/order", orderRouter);
+
+app.use("/api/v1/order",requireAuth, orderRouter);
+app.use('/api/v1/feedback',feedbackRouter);
 
 app.use('/api/v1/admin',adminRouter)
 
