@@ -46,7 +46,7 @@ app.use("/api/v1/cart", cartRouter);
 
 app.use("/api/v1/products", productRouter);
 
-app.use("/api/v1/order",requireAuth, orderRouter);
+app.use("/api/v1/order", orderRouter);
 app.use('/api/v1/feedback',feedbackRouter);
 
 app.use('/api/v1/admin',adminRouter)
