@@ -4,7 +4,7 @@ dotenv.config({ path: ".env" });
 
 
 const client = createClient({
-    password:process.env.REDIS_PASSSWORD,
+    password:process.env.REDIS_PASSWORD,
     socket: {
         host: 'redis-16923.c262.us-east-1-3.ec2.redns.redis-cloud.com',
         port: 16923
