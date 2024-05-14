@@ -1,8 +1,47 @@
+import bcrypt from "bcryptjs";
 import User from "../models/UserModel.js";
 import AppError from "../utils/appError.js";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
+import crypto from 'crypto';
+import redisClient from '../utils/config/redis.config.js';
+import { sendOTPToEmail } from "../utils/helpers/mailer.helper.js";
 import { generateToken } from "../utils/helpers/jwt.helper.js";
+
+export const sendOTP = async (req, res, next) => {
+  const { email } = req.body;
+  try {
+    const otp = crypto.randomInt(100000, 999999).toString();
+    await redisClient.set(email, otp, { EX: 300 });
+    await sendOTPToEmail(email, otp);
+    res.status(200).json({
+      status: "Success",
+      message: "OTP sent to your email",
+    });
+  } catch (err) {
+    console.error(err);
+    return next(new AppError("Error sending OTP", 500));
+  }
+};
+
+export const verifyOTP = async(req,res,next)=>{
+  const {email,otp} = req.body;
+  try{
+    const storedOTP = await redisClient.get(email);
+    if (!storedOTP) {
+      return next(new AppError("OTP expired or invalid", 400));
+    }
+    if (storedOTP !== otp) {
+      return next(new AppError("Invalid OTP", 400));
+    }
+    await redisClient.del(email); 
+    res.status(200).json({
+      status: "Success",
+      message: "OTP verified successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    return next(new AppError("Error verifying OTP", 500));
+  }
+}
 
 export const registerUser = async (req, res, next) => {
   const { userName, email, password, phoneNumber, shippingAddress } = req.body;
