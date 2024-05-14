@@ -1,8 +1,8 @@
 import express, { urlencoded } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import passport from "passport";
-import session from "express-session";
+// import passport from "passport";
+// import session from "express-session";
 
 
 
@@ -15,7 +15,7 @@ import feedbackRouter from './routes/feedbackRoutes.js';
 import adminRouter from './routes/adminRoutes.js';
 import requireAuth from "./middleware/requireAuth.js";
 import errorHandler from "./controllers/errorController.js";
-import { useGoogleStrategy } from "./utils/config/passport.config.js";
+// import { useGoogleStrategy } from "./utils/config/passport.config.js";
 
 
 dotenv.config({ path: ".env" });
@@ -26,22 +26,22 @@ app.use(cors());
 app.use(express.json());
 app.use(urlencoded({extended:false}))
 
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  saveUninitialized: true,
-  resave: false,
-  maxAge: 1000 * 60 * 15,
-  cookie:{
-      secure: true
-         }
-  }));
+// app.use(session({
+//   secret: process.env.SESSION_SECRET,
+//   saveUninitialized: true,
+//   resave: false,
+//   maxAge: 1000 * 60 * 15,
+//   cookie:{
+//       secure: true
+//          }
+//   }));
 
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
-useGoogleStrategy();      
+// useGoogleStrategy();      
 
-app.use("/auth/google", authRouter);
+// app.use("/auth/google", authRouter);
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/cart", cartRouter);
