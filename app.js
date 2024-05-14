@@ -37,7 +37,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-useGoogleStrategy();
+useGoogleStrategy();      
 
 app.use("/auth/google", authRouter);
 
