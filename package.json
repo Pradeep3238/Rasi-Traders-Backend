@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "nodemon server.js",
     "debug": "ndb server.js",
-    "vercel-build": "node ./build.js"
+    "vercel-build": "echo 'hello'"
 
   },
   "keywords": [],
