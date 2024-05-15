@@ -153,7 +153,7 @@ export const deleteUser = async (req, res, next) => {
 
 export const getAllUsers = async (req, res, next) => {
   try {
-    const user = await User.find({}).populate({path:'orders', model:'Order'})
+    const user = await User.find({}).populate({path:'orders', model:'Order'}).sort({createdAt:-1})
     console.log(user)
     return res.status(200).json({
       status: "success",
