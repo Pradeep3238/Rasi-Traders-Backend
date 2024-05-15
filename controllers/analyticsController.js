@@ -1,6 +1,6 @@
 import Order from '../models/OrderModel.js';
 import User from '../models/UserModel.js';
-import Feedback from '../models/FeedbackModel.js';
+import Feedback from '../models/feedbackModel.js';
 import Product from '../models/ProductModel.js';
 
 
