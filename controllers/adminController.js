@@ -1,4 +1,4 @@
-import Admin from "../models/AdminModel.js";
+import Admin from "../models/adminModel.js";
 import AppError from "../utils/appError.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/helpers/jwt.helper.js";
