@@ -13,7 +13,6 @@ import cartRouter from "./routes/cartRoutes.js";
 import orderRouter from "./routes/orderRoutes.js";
 import feedbackRouter from './routes/feedbackRoutes.js';
 import adminRouter from './routes/adminRoutes.js';
-import analyticsController from './routes/analyticsRoutes.js';
 import errorHandler from "./controllers/errorController.js";
 // import { useGoogleStrategy } from "./utils/config/passport.config.js";
 
@@ -22,13 +21,7 @@ dotenv.config({ path: ".env" });
 
 const app = express();
 
-const corsOptions = {
-    origin: ['http://localhost:3000', 'https://rasi-traders-admin.vercel.app'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-  };
-  
-app.use(cors(corsOptions));
+app.use(cors());
   
 app.use(express.json());
 app.use(urlencoded({extended:false}))
@@ -49,7 +42,6 @@ app.use(urlencoded({extended:false}))
 // useGoogleStrategy();      
 
 // app.use("/auth/google", authRouter);
-app.use('/api/v1/analytics',analyticsController);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/cart", cartRouter);
 
